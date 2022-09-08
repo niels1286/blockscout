@@ -393,7 +393,7 @@ msgstr ""
 #: lib/block_scout_web/templates/layout/_footer.html.eex:41
 #, elixir-autogen, elixir-format
 msgid "Chat (#blockscout)"
-msgstr ""
+msgstr "Chat"
 
 #: lib/block_scout_web/views/block_view.ex:63
 #, elixir-autogen, elixir-format
