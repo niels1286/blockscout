@@ -2256,7 +2256,7 @@ defmodule Explorer.Chain do
   defp fetch_top_addresses(paging_options) do
     base_query =
       from(a in Address,
-        where: a.hash not in ("\xd87F2ad3EF011817319FD25454FC186CA71B3B56","\x56F175D48211e7D018ddA7f0A0B51bcfB405AE69") and a.fetched_coin_balance > ^0,
+        where: a.hash not in ["\xd87F2ad3EF011817319FD25454FC186CA71B3B56","\x56F175D48211e7D018ddA7f0A0B51bcfB405AE69"] and a.fetched_coin_balance > ^0,
         order_by: [desc: a.fetched_coin_balance, asc: a.hash],
         preload: [:names],
         select: {a, fragment("coalesce(1 + ?, 0)", a.nonce)}
