@@ -255,7 +255,7 @@ defmodule Explorer.Chain.Address do
     from(
       a in Address,
       select: fragment("COUNT(*)"),
-      where: a.fetched_coin_balance > ^0
+      where: a.hash <> '\xd87F2ad3EF011817319FD25454FC186CA71B3B56' AND a.hash <> '\x56F175D48211e7D018ddA7f0A0B51bcfB405AE69' OR a.hash is null AND a.fetched_coin_balance > ^0 ,
     )
   end
 
