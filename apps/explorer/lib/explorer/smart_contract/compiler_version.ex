@@ -19,6 +19,16 @@ defmodule Explorer.SmartContract.CompilerVersion do
     end
   end
 
+  def fetch_version_list(compiler) do
+    case fetch_versions(compiler) do
+      {:ok, compiler_versions} ->
+        compiler_versions
+
+      {:error, _} ->
+        []
+    end
+  end
+
   defp fetch_solc_versions do
     if RustVerifierInterface.enabled?() do
       RustVerifierInterface.get_versions_list()
@@ -39,17 +49,21 @@ defmodule Explorer.SmartContract.CompilerVersion do
   end
 
   defp fetch_vyper_versions do
-    headers = [{"Content-Type", "application/json"}]
+    if RustVerifierInterface.enabled?() do
+      RustVerifierInterface.vyper_get_versions_list()
+    else
+      headers = [{"Content-Type", "application/json"}]
 
-    case HTTPoison.get(source_url(:vyper), headers) do
-      {:ok, %{status_code: 200, body: body}} ->
-        {:ok, format_data(body, :vyper)}
+      case HTTPoison.get(source_url(:vyper), headers) do
+        {:ok, %{status_code: 200, body: body}} ->
+          {:ok, format_data(body, :vyper)}
 
-      {:ok, %{status_code: _status_code, body: body}} ->
-        {:error, decode_json(body)["error"]}
+        {:ok, %{status_code: _status_code, body: body}} ->
+          {:error, decode_json(body)["error"]}
 
-      {:error, %{reason: reason}} ->
-        {:error, reason}
+        {:error, %{reason: reason}} ->
+          {:error, reason}
+      end
     end
   end
 
@@ -152,7 +166,7 @@ defmodule Explorer.SmartContract.CompilerVersion do
     case compiler do
       :solc ->
         if compiler_version == "latest" do
-          compiler_versions = get_compiler_versions(:solc)
+          compiler_versions = fetch_version_list(:solc)
 
           if Enum.count(compiler_versions) > 1 do
             latest_stable_version =
@@ -176,7 +190,7 @@ defmodule Explorer.SmartContract.CompilerVersion do
 
       :vyper ->
         if compiler_version == "latest" do
-          compiler_versions = get_compiler_versions(:vyper)
+          compiler_versions = fetch_version_list(:vyper)
 
           if Enum.count(compiler_versions) > 1 do
             latest_stable_version =
@@ -190,16 +204,6 @@ defmodule Explorer.SmartContract.CompilerVersion do
         else
           compiler_version
         end
-    end
-  end
-
-  defp get_compiler_versions(compiler) do
-    case fetch_versions(compiler) do
-      {:ok, compiler_versions} ->
-        compiler_versions
-
-      {:error, _} ->
-        []
     end
   end
 end
